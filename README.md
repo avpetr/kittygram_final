@@ -1,26 +1,34 @@
-#  Как работать с репозиторием финального задания
+![example workflow](https://github.com/avpetr/kittygram_final/actions/workflows/kittygram_workflow.yml/badge.svg)
+# Проект Kittygram 
+Kittygram - соцсеть для любителей котов (не хватает собачек).
 
-## Что нужно сделать
-
-Настроить запуск проекта Kittygram в контейнерах и CI/CD с помощью GitHub Actions
-
-## Как проверить работу с помощью автотестов
-
-В корне репозитория создайте файл tests.yml со следующим содержимым:
-```yaml
-repo_owner: ваш_логин_на_гитхабе
-kittygram_domain: полная ссылка (https://доменное_имя) на ваш проект Kittygram
-taski_domain: полная ссылка (https://доменное_имя) на ваш проект Taski
-dockerhub_username: ваш_логин_на_докерхабе
+## Запуск проекта
+1. Для запуска проекта необходимо загрузить файл [_docker-compose.production.yml_](https://github.com/avpetr/kittygram_final/blob/main/docker-compose.production.yml) 
+2. Создать файл .env в той же директории и заполнить следующим образом:
 ```
+POSTGRES_USER = имя_пользователя
+POSTGRES_PASSWORD = пароль
+POSTGRES_DB = имя_БД
+DB_HOST = db (имя контейнера хоста БД)
+DB_PORT = 5432 (порт БД)
+SECRET_KEY = секретный_ключ
+DEBUG = True | False
+ALLOWED_HOSTS = разрешенные_хосты (например:localhost,127.0.0.1)
+```
+4. Запустить Docker Compose, далее собрать статику и сделать миграции следующими командами:
+```bash
+sudo docker compose -f docker-compose.yml pull
+sudo docker compose -f docker-compose.yml down
+sudo docker compose -f docker-compose.yml up -d
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
+sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+```
+## Стек технологий
+- Django
+- ReactJS
+- Ngingx
+- Docker
 
-Скопируйте содержимое файла `.github/workflows/main.yml` в файл `kittygram_workflow.yml` в корневой директории проекта.
 
-Для локального запуска тестов создайте виртуальное окружение, установите в него зависимости из backend/requirements.txt и запустите в корневой директории проекта `pytest`.
-
-## Чек-лист для проверки перед отправкой задания
-
-- Проект Taski доступен по доменному имени, указанному в `tests.yml`.
-- Проект Kittygram доступен по доменному имени, указанному в `tests.yml`.
-- Пуш в ветку main запускает тестирование и деплой Kittygram, а после успешного деплоя вам приходит сообщение в телеграм.
-- В корне проекта есть файл `kittygram_workflow.yml`.
+ Автор: avpetr
